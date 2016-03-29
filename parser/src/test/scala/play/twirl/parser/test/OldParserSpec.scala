@@ -32,9 +32,8 @@ object OldParserSpec extends Specification {
   }
 
   def parseFailure(templateName: String, message: String, line: Int, column: Int) = parse(templateName) must beLike {
-    case parser.NoSuccess(msg, rest) => {
+    case parser.NoSuccess(msg, rest) =>
       if (msg == message && rest.pos.line == line && rest.pos.column == column) ok else ko
-    }
   }
 
   def parseTemplate(templateName: String): Template = {

@@ -20,7 +20,7 @@ object ParserSpec extends Specification {
   }
 
   def parseString(template: String) = {
-    (new TwirlParser(shouldParseInclusiveDot = false)).parse(template)
+    parser.parse(template)
   }
 
   def parseSuccess(templateName: String) = {
@@ -32,10 +32,8 @@ object ParserSpec extends Specification {
   }
 
   def parseFailure(templateName: String, message: String, line: Int, column: Int) = parse(templateName) must beLike {
-    case parser.Error(_, rest, errors) => {
-      val e = errors.head
-      (e.str must_== message) and (e.pos.line must_== line) and (e.pos.column must_== column)
-    }
+    case parser.Error(_, rest, e :: _) =>
+      if (e.str == message && e.pos.line == line && e.pos.column == column) ok else ko
   }
 
   def parseTemplate(templateName: String): Template = {
@@ -43,7 +41,6 @@ object ParserSpec extends Specification {
   }
 
   def parseTemplateString(template: String): Template = {
-    val parser = new TwirlParser(shouldParseInclusiveDot = false)
     parser.parse(template) match {
       case parser.Success(template, input) =>
         if (!input.atEnd) sys.error("Template parsed but not at source end")
